@@ -1,53 +1,3 @@
-// "use client";
-
-// import { useEffect, useState } from "react";
-// import { useRouter } from "next/navigation";
-// import { supabase } from "../../lib/supabaseClient";
-// import Link from "next/link";
-
-// export default function ProfilePage() {
-//   const [username, setUsername] = useState("");
-//   const [loading, setLoading] = useState(false);
-//   const [session, setSession] = useState<any>(null);
-//   const router = useRouter();
-
-//   useEffect(() => {
-//     supabase.auth.getSession().then(({ data: { session } }) => {
-//       setSession(session);
-//       if (!session) router.replace("/login");
-//       else fetchProfile(session.user.id);
-//     });
-//     // eslint-disable-next-line
-//   }, []);
-
-//   async function fetchProfile(uid: string) {
-//     const { data } = await supabase.from('users').select('name').eq('id', uid).single();
-//     setUsername(data?.name || "");
-//   }
-
-//   async function updateProfile() {
-//     setLoading(true);
-//     await supabase.from('users').upsert({ id: session.user.id, name });
-//     setLoading(false);
-//     alert("Profil aktualisiert!");
-//   }
-
-//   if (!session) return null;
-
-//   return (
-//     <main>
-//       <h2>Profil bearbeiten</h2>
-//       <Link href="/dashboard"><button>Dashboard</button></Link>
-//       <Link href="/settings"><button>Settings</button></Link>
-//       <hr />      
-//       <label>
-//         Name: <input value={username} onChange={e => setUsername(e.target.value)} />
-//       </label>
-//       <button onClick={updateProfile} disabled={loading}>Speichern</button>
-//     </main>
-//   );
-// }
-
 "use client";
 
 import { useEffect, useState } from "react";
@@ -56,10 +6,11 @@ import { supabase } from "../../lib/supabaseClient";
 import Link from "next/link";
 
 export default function ProfilePage() {
-  const [name, setName] = useState("");
-  const [email, setEmail] = useState("");
-  const [loading, setLoading] = useState(false);
+  const [email, setEmail] = useState("");  
+  const [newEmail, setNewEmail] = useState("");
   const [session, setSession] = useState<any>(null);
+  const [message, setMessage] = useState("");
+  const [loading, setLoading] = useState(false);
   const router = useRouter();
 
   useEffect(() => {
@@ -67,30 +18,30 @@ export default function ProfilePage() {
       setSession(session);
       if (!session) router.replace("/login");
       else {
-        setEmail(session.user.email); // Auth Email
-        fetchProfile(session.user.id);
+        setEmail(session.user.email); // Auth Email        
+        setNewEmail(session.user.email); // Feld vorbefüllen
       }
     });
   }, [router]);
 
-  async function fetchProfile(uid: string) {
-    const { data, error } = await supabase.from("users").select("*").eq("id", uid).single();
-    if (error) {
-      // Optional: Fehlerbehandlung
-      setName("");
-    } else {
-      setName(data?.name || "");
-      // Falls du weitere Felder hast, diese hier auch setzen
-    }
-  }
-
-  async function updateProfile() {
+  const handleEmailChange = async (e: React.FormEvent) => {
+    e.preventDefault();
     setLoading(true);
-    const { error } = await supabase.from("users").upsert({ id: session.user.id, name });
+    setMessage("");
+    if (newEmail === email) {
+      setMessage("Die neue E-Mail ist dieselbe wie die aktuelle.");
+      setLoading(false);
+      return;
+    }
+    const { data, error } = await supabase.auth.updateUser({ email: newEmail });
+    if (error) {
+      setMessage("Fehler: " + error.message);
+    } else {
+      setMessage("E-Mail geändert. Bitte bestätige die neue Adresse via E-Mail.");
+      setEmail(newEmail);
+    }
     setLoading(false);
-    if (error) alert("Fehler beim Speichern");
-    else alert("Profil aktualisiert!");
-  }
+  };
 
   if (!session) return null;
 
@@ -101,15 +52,20 @@ export default function ProfilePage() {
       <Link href="/settings"><button>Settings</button></Link>
       <hr />
       <div>
-        <p><b>E-Mail (auth):</b> {email}</p>
-        <label>
-          Name:{" "}
-          <input value={name} onChange={e => setName(e.target.value)} />
-        </label>
-        <br />
-        <button onClick={updateProfile} disabled={loading}>
-          Speichern
-        </button>
+        <form onSubmit={handleEmailChange}>
+          <label>
+            <b>E-Mail ändern:</b>
+            <input
+              type="email"
+              value={newEmail}
+              onChange={e => setNewEmail(e.target.value)}
+              disabled={loading}
+              required
+            />
+          </label>
+          <button type="submit" disabled={loading}>E-Mail aktualisieren</button>
+        </form>
+        {message && <p>{message}</p>}
       </div>
     </main>
   );
