@@ -1,84 +1,50 @@
-// app/dashboard/page.tsx
+'use client';
+import { useEffect, useState } from 'react';
+import { supabase } from '../../lib/supabaseClient';
 
-//Diese Seite muss bei jedem Request neu gerendert werden." Das ist entscheidend, 
-//damit Supabase Zugriff auf aktuelle Cookies (inkl. Session) hat.
-export const dynamic = 'force-dynamic'; // <- WICHTIG!
-//export const fetchCache = 'force-no-store'; 
+export default function DashboardPage() {
+  const [times, setTimes] = useState<any[]>([]);
+  const [loading, setLoading] = useState(true);
 
-import { supabaseServer } from '@/lib/supabaseServer';
-import { redirect } from 'next/navigation';
-import Dashboard from '@/components/Dashboard';
+  // Neue Zeit erfassen (Beispiel)
+  const addEntry = async () => {
+    const { data: { user } } = await supabase.auth.getUser();
+    await supabase.from('times').insert([{
+      user_id: user?.id,
+      start_time: new Date(),
+      end_time: null,
+      description: 'Neue Aufgabe'
+    }]);
+    loadTimes();
+  };
 
+  const loadTimes = async () => {
+    setLoading(true);
+    const { data, error } = await supabase
+      .from('times')
+      .select('*')
+      .order('start_time', { ascending: false });
+    if (!error) setTimes(data ?? []);
+    setLoading(false);
+  };
 
-export default async function DashboardPage() {
-  const supabase = supabaseServer();
-
-  const {
-    data: { session },
-  } = await supabase.auth.getSession();
-  if (!session) {
-    redirect('/auth/login');
-  }
-
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
-  if (!user) {
-    redirect('/auth/login');
-  }
-
-  const { data: projects, error: projectsError } = await supabase
-    .from('projects')
-    .select('*')
-    .eq('user_id', user.id);
-  if (projectsError) throw new Error(projectsError.message);
-
-  const { data: invoices, error: invoicesError } = await supabase
-    .from('invoices')
-    .select('*')
-    .eq('user_id', user.id);
-  if (invoicesError) throw new Error(invoicesError.message);
-
-  const { data: timeEntries, error: timeEntriesError } = await supabase
-    .from('time_entries')
-    .select('*')
-    .eq('user_id', user.id);
-  if (timeEntriesError) throw new Error(timeEntriesError.message);
+  useEffect(() => { loadTimes(); }, []);
 
   return (
-    <Dashboard
-      user={user}
-      projects={projects}
-      invoices={invoices}
-      timeEntries={timeEntries}
-    />
+    <div className="p-10">
+      <h2 className="text-2xl mb-4">Dashboard</h2>
+      <button onClick={addEntry} className="mb-4 bg-green-500 text-white px-4 py-2 rounded">Neue Zeit erfassen</button>
+      {loading ? <div>Lade...</div> : (
+        <ul>
+          {times.map(t =>
+            <li key={t.id} className="mb-2 border p-2 rounded bg-gray-50">
+              <div>Start: {new Date(t.start_time).toLocaleString()}</div>
+              {t.end_time && <div>Ende: {new Date(t.end_time).toLocaleString()}</div>}
+              <div>Beschreibung: {t.description}</div>
+            </li>
+          )}
+        </ul>
+      )}
+    </div>
   );
 }
-
-
-
-
-
-
-// a) Supabase-Session prüfen
-// Holt eine Instanz von Supabase (server-side, d.h. sicher auf dem Server, nicht im Browser).
-// Prüft: Gibt es eine gültige Session?
-// Nein: Weiterleitung zur Login-Seite (redirect('/auth/login')).
-// Holt den eingeloggten Nutzer.
-// Falls nicht gefunden: Erneut Redirect.
-
-// b) Daten für Nutzer abfragen
-// Projekte:
-// Fragt alle Projekte ab, die zur User-ID passen:
-
-// supabase.from('projects').select('*').eq('user_id', user.id)
-// Rechnungen:
-// Ähnlich für Rechnungen.
-
-// Zeiteinträge:
-// Fragt ebenfalls zeitspezifische Entries für den Nutzer ab.
-
-// c) Rendering
-// Gibt die Daten als Props an das Client-seitige Dashboard weiter:
-// <Dashboard user={user} projects={...} invoices={...} timeEntries={...} />
-

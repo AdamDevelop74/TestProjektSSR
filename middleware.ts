@@ -1,32 +1,23 @@
-// middleware.ts
-import { createMiddlewareClient } from '@supabase/auth-helpers-nextjs'
-import { NextResponse } from 'next/server'
-import type { NextRequest } from 'next/server'
+import { NextResponse } from 'next/server';
+import type { NextRequest } from 'next/server';
 
-export async function middleware(req: NextRequest) {
-  
-  console.log('Middleware is running...') // 👈 sichtbar im Terminal
+const PROTECTED_PATHS = ['/dashboard', '/profile', '/settings'];
 
-  const res = NextResponse.next()
-  const supabase = createMiddlewareClient({ req, res })
-  const { data: { session } } = await supabase.auth.getSession()
-  
-  // 👇 PRÜFUNG HINZUFÜGEN!
-  if (!session) {
-    // Nicht eingeloggt → redirect zu Login
-    return NextResponse.redirect(new URL('/auth/login', req.url))
+export function middleware(request: NextRequest) {
+  const { cookies, nextUrl } = request;
+  const isProtected = PROTECTED_PATHS.some((p) => nextUrl.pathname.startsWith(p));
+  const token = cookies.get('sb-access-token')?.value;
+
+  if (isProtected && !token) {
+    return NextResponse.redirect(new URL('/login', request.url));
   }
 
-
-
-
-  return res
+  if ((nextUrl.pathname === '/login' || nextUrl.pathname === '/') && token) {
+    return NextResponse.redirect(new URL('/dashboard', request.url));
+  }
+  return NextResponse.next();
 }
 
 export const config = {
-  matcher: [
-    '/dashboard/:path*', // schützt das Dashboard
-    '/api/auth/:path*', // 👈 wichtig!
-    ], 
-}
-
+  matcher: ['/dashboard/:path*', '/profile/:path*', '/settings/:path*', '/login', '/'],
+};
