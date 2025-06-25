@@ -7,8 +7,6 @@ import Link from "next/link";
 
 export default function ProfilePage() {
   const [email, setEmail] = useState("");  
-  const [phone, setPhone] = useState("");
-  const [newPhone, setNewPhone] = useState("");
   const [displayName, setDisplayName] = useState("");
   const [newDisplayName, setNewDisplayName] = useState("");
   const [session, setSession] = useState<any>(null);
@@ -22,33 +20,12 @@ export default function ProfilePage() {
       if (!session) router.replace("/login");
       else {
         setEmail(session.user.email);        
-        setPhone(session.user.phone ?? "");
-        setNewPhone(session.user.phone ?? "");
         setDisplayName(session.user.user_metadata?.display_name ?? "");
         setNewDisplayName(session.user.user_metadata?.display_name ?? "");
       }
     });
   }, [router]);
-
-  // Phone ändern
-  const handlePhoneChange = async (e: React.FormEvent) => {
-    e.preventDefault();
-    setLoading(true);
-    setMessage("");
-    if (newPhone === phone) {
-      setMessage("Die neue Telefonnummer ist dieselbe wie die aktuelle.");
-      setLoading(false);
-      return;
-    }
-    const { error } = await supabase.auth.updateUser({ phone: newPhone });
-    if (error) {
-      setMessage("Fehler: " + error.message);
-    } else {
-      setMessage("Telefonnummer geändert. Bestätige ggf. deine neue Nummer via SMS.");
-      setPhone(newPhone);
-    }
-    setLoading(false);
-  };
+  
 
   // Anzeigename ändern
   const handleDisplayNameChange = async (e: React.FormEvent) => {
@@ -85,22 +62,6 @@ export default function ProfilePage() {
         <b>E-Mail:</b> {email}
       </div>
 
-      <div style={{ marginBottom: 15 }}>
-        <form onSubmit={handlePhoneChange}>
-          <label>
-            <b>Telefonnummer:</b>
-            <input
-              type="tel"
-              value={newPhone}
-              onChange={e => setNewPhone(e.target.value)}
-              disabled={loading}
-              placeholder="+49123456789"
-              style={{ marginLeft: 10 }}
-            />
-          </label>
-          <button type="submit" disabled={loading}>Telefon aktualisieren</button>
-        </form>
-      </div>
 
       <div style={{ marginBottom: 15 }}>
         <form onSubmit={handleDisplayNameChange}>
