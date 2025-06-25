@@ -21,13 +21,13 @@ export default function ProfilePage() {
   }, []);
 
   async function fetchProfile(uid: string) {
-    const { data } = await supabase.from('users').select('name').eq('id', uid).single();
+    const { data } = await supabase.from('auth.users').select('name').eq('id', uid).single();
     setUsername(data?.name || "");
   }
 
   async function updateProfile() {
     setLoading(true);
-    await supabase.from('profiles').upsert({ id: session.user.id, username });
+    await supabase.from('auth.users').upsert({ id: session.user.id, name });
     setLoading(false);
     alert("Profil aktualisiert!");
   }
