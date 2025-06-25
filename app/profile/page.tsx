@@ -53,7 +53,7 @@ export default function ProfilePage() {
 
   return (
     <main>
-      <h2>Profil bearbeiten</h2>
+      <h2>Profil</h2>
       <Link href="/dashboard"><button>Dashboard</button></Link>
       <Link href="/settings"><button>Settings</button></Link>
       <hr />

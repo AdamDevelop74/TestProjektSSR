@@ -5,8 +5,7 @@ import { useRouter } from "next/navigation";
 import { supabase } from "../../lib/supabaseClient";
 import Link from "next/link";
 
-export default function SettingsPage() {
-  const [password, setPassword] = useState("");
+export default function SettingsPage() { 
   const [session, setSession] = useState<any>(null);
   const router = useRouter();
 
@@ -18,26 +17,18 @@ export default function SettingsPage() {
     // eslint-disable-next-line
   }, []);
 
-  async function updatePassword() {
-    if(password.length < 6) return alert("Mind. 6 Zeichen");
-    const { error } = await supabase.auth.updateUser({ password });
-    if (!error) alert("Passwort geändert!");
-    else alert(error.message);
-  }
 
   if (!session) return null;
 
   return (
     <main>
-       <h2>Account Einstellungen</h2>
+       <h2>Settings</h2>
       <Link href="/dashboard"><button>Dashboard</button></Link>
       <Link href="/profile"><button>Profil</button></Link>
        <hr />       
       <label>
-        Neues Passwort:
-        <input type="password" value={password} onChange={e => setPassword(e.target.value)} />
-      </label>
-      <button onClick={updatePassword}>Passwort ändern</button>
+       einfach nur Text        
+      </label>      
     </main>
   );
 }

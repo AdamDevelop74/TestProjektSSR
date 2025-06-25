@@ -147,6 +147,8 @@ export default function DashboardPage() {
         )}
       </div>
 
+    <hr />
+
       <h3>Letzte Zeiteinträge</h3>
       <table>
         <thead>
@@ -180,6 +182,7 @@ export default function DashboardPage() {
           ))}
         </tbody>
       </table>
+      <hr />
 
       {/* PROJEKTE */}
       <h3>Projekte</h3>
@@ -203,7 +206,9 @@ export default function DashboardPage() {
           ))}
         </tbody>
       </table>
+      <hr />
 
+      
       {/* RECHNUNGEN */}
       <h3>Rechnungen</h3>
       <table>
