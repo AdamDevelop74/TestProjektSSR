@@ -37,9 +37,7 @@ export default function DashboardPage() {
   const [times, setTimes] = useState<Time[]>([]);
   const [projects, setProjects] = useState<Project[]>([]);
   const [invoices, setInvoices] = useState<Invoice[]>([]);
-  const [note, setNote] = useState("");
-  const [working, setWorking] = useState(false);
-  const router = useRouter();
+   const router = useRouter();
 
   useEffect(() => {
     supabase.auth.getSession().then(({ data: { session } }) => {
@@ -61,7 +59,6 @@ export default function DashboardPage() {
       .eq("user_id", userId)
       .order("started_at", { ascending: false });
     setTimes(timeData || []);
-    setWorking(timeData && timeData[0] && !timeData[0].ended_at);
 
     // Projekte holen
     const { data: projectData } = await supabase
@@ -78,36 +75,6 @@ export default function DashboardPage() {
       .eq("user_id", userId)
       .order("created_at", { ascending: false });
     setInvoices(invoiceData || []);
-  }
-
-  async function handleStart() {
-    await supabase.from("time_entries").insert({
-      user_id: session.user.id,
-      started_at: new Date().toISOString(),
-      note,
-    });
-    setNote("");
-    fetchAllData(session.user.id);
-  }
-
-  async function handleStop(id: string) {
-    const endedAt = new Date().toISOString();
-    // Optionale automatische Dauerberechnung
-    const entry = times.find((t) => t.id === id);
-    let duration = null;
-    if (entry) {
-      duration =
-        Math.round(
-          (new Date(endedAt).getTime() - new Date(entry.started_at).getTime()) /
-            60000
-        );
-    }
-
-    await supabase
-      .from("time_entries")
-      .update({ ended_at: endedAt, duration_minutes: duration })
-      .eq("id", id);
-    fetchAllData(session.user.id);
   }
 
   async function handleLogout() {
@@ -129,25 +96,6 @@ export default function DashboardPage() {
       </Link>
       <hr />
 
-      {/* ZEITERFASSUNG */}
-      <div>
-        <input
-          type="text"
-          placeholder="Beschreibung (optional)"
-          value={note}
-          disabled={working}
-          onChange={(e) => setNote(e.target.value)}
-        />
-        {!working ? (
-          <button onClick={handleStart}>Zeit starten</button>
-        ) : (
-          <button onClick={() => handleStop(times[0].id)}>
-            Zeit stoppen
-          </button>
-        )}
-      </div>
-
-    <hr />
 
       <h3>Letzte Zeiteinträge</h3>
       <table>
@@ -208,7 +156,7 @@ export default function DashboardPage() {
       </table>
       <hr />
 
-      
+
       {/* RECHNUNGEN */}
       <h3>Rechnungen</h3>
       <table>
