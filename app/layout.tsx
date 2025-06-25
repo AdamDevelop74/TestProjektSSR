@@ -1,9 +1,12 @@
-import './globals.css';
+import "./globals.css";
+import type { ReactNode } from "react";
 
-export default function RootLayout({ children }: { children: React.ReactNode }) {
+export default function RootLayout({children}: {children: ReactNode}) {
   return (
     <html lang="de">
-      <body>{children}</body>
+      <body>
+        {children}
+      </body>
     </html>
   );
 }

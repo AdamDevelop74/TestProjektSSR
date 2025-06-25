@@ -1,9 +1,39 @@
+"use client";
+
+import { useState, useEffect } from "react";
+import { useRouter } from "next/navigation";
+import { supabase } from "../../lib/supabaseClient";
+
 export default function SettingsPage() {
+  const [password, setPassword] = useState("");
+  const [session, setSession] = useState<any>(null);
+  const router = useRouter();
+
+  useEffect(() => {
+    supabase.auth.getSession().then(({ data: { session } }) => {
+      setSession(session);
+      if (!session) router.replace("/login");
+    });
+    // eslint-disable-next-line
+  }, []);
+
+  async function updatePassword() {
+    if(password.length < 6) return alert("Mind. 6 Zeichen");
+    const { error } = await supabase.auth.updateUser({ password });
+    if (!error) alert("Passwort geändert!");
+    else alert(error.message);
+  }
+
+  if (!session) return null;
+
   return (
-    <div className="max-w-xl mx-auto mt-10 p-8 border rounded">
-      <h2 className="mb-4 text-xl">Einstellungen</h2>
-      {/* Felder wie: Passwort ändern, notifications usw */}
-      <p>Hier kannst du weitere Einstellungen vornehmen.</p>
-    </div>
+    <main>
+      <h2>Account Einstellungen</h2>
+      <label>
+        Neues Passwort:
+        <input type="password" value={password} onChange={e => setPassword(e.target.value)} />
+      </label>
+      <button onClick={updatePassword}>Passwort ändern</button>
+    </main>
   );
 }

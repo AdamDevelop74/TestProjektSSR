@@ -1,26 +1,45 @@
-'use client';
-import { useEffect, useState } from 'react';
-import { supabase } from '../../lib/supabaseClient';
+"use client";
+
+import { useEffect, useState } from "react";
+import { useRouter } from "next/navigation";
+import { supabase } from "../../lib/supabaseClient";
 
 export default function ProfilePage() {
-  const [user, setUser] = useState<any>(null);
+  const [username, setUsername] = useState("");
+  const [loading, setLoading] = useState(false);
+  const [session, setSession] = useState<any>(null);
+  const router = useRouter();
 
   useEffect(() => {
-    supabase.auth.getUser().then(x => setUser(x.data.user));
+    supabase.auth.getSession().then(({ data: { session } }) => {
+      setSession(session);
+      if (!session) router.replace("/login");
+      else fetchProfile(session.user.id);
+    });
+    // eslint-disable-next-line
   }, []);
 
-  if (!user) return <div>Lade Profil...</div>;
+  async function fetchProfile(uid: string) {
+    const { data } = await supabase.from('profiles').select('username').eq('id', uid).single();
+    setUsername(data?.username || "");
+  }
+
+  async function updateProfile() {
+    setLoading(true);
+    await supabase.from('profiles').upsert({ id: session.user.id, username });
+    setLoading(false);
+    alert("Profil aktualisiert!");
+  }
+
+  if (!session) return null;
 
   return (
-    <div className="max-w-xl mx-auto mt-10 p-8 border rounded">
-      <h2 className="text-xl mb-4">Profil</h2>
-      <div>
-        <label className="block">E-Mail: {user.email}</label>
-        {/* Weitere Felder wie Name, Avatar hier */}
-      </div>
-      <form /*... zum Ändern anderer Felder ...*/>
-        {/* Beispiel: Name ändern */}
-      </form>
-    </div>
+    <main>
+      <h2>Profil bearbeiten</h2>
+      <label>
+        Name: <input value={username} onChange={e => setUsername(e.target.value)} />
+      </label>
+      <button onClick={updateProfile} disabled={loading}>Speichern</button>
+    </main>
   );
 }
