@@ -21,8 +21,8 @@ export default function ProfilePage() {
   }, []);
 
   async function fetchProfile(uid: string) {
-    const { data } = await supabase.from('profiles').select('username').eq('id', uid).single();
-    setUsername(data?.username || "");
+    const { data } = await supabase.from('users').select('name').eq('id', uid).single();
+    setUsername(data?.name || "");
   }
 
   async function updateProfile() {
