@@ -7,7 +7,6 @@ import Link from "next/link";
 
 export default function ProfilePage() {
   const [email, setEmail] = useState("");  
-  const [newEmail, setNewEmail] = useState("");
   const [phone, setPhone] = useState("");
   const [newPhone, setNewPhone] = useState("");
   const [displayName, setDisplayName] = useState("");
@@ -23,38 +22,13 @@ export default function ProfilePage() {
       if (!session) router.replace("/login");
       else {
         setEmail(session.user.email);        
-        setNewEmail(session.user.email);       
-        
-        // Phone
         setPhone(session.user.phone ?? "");
         setNewPhone(session.user.phone ?? "");
-        
-        // Display Name
         setDisplayName(session.user.user_metadata?.display_name ?? "");
         setNewDisplayName(session.user.user_metadata?.display_name ?? "");
       }
     });
   }, [router]);
-
-  // Email ändern
-  const handleEmailChange = async (e: React.FormEvent) => {
-    e.preventDefault();
-    setLoading(true);
-    setMessage("");
-    if (newEmail === email) {
-      setMessage("Die neue E-Mail ist dieselbe wie die aktuelle.");
-      setLoading(false);
-      return;
-    }
-    const { error } = await supabase.auth.updateUser({ email: newEmail });
-    if (error) {
-      setMessage("Fehler: " + error.message);
-    } else {
-      setMessage("E-Mail geändert. Bitte bestätige die neue Adresse via E-Mail.");
-      setEmail(newEmail);
-    }
-    setLoading(false);
-  };
 
   // Phone ändern
   const handlePhoneChange = async (e: React.FormEvent) => {
@@ -106,24 +80,12 @@ export default function ProfilePage() {
       <Link href="/dashboard"><button>Dashboard</button></Link>
       <Link href="/settings"><button>Settings</button></Link>
       <hr />
-      <div style={{marginBottom: 15}}>
-        <form onSubmit={handleEmailChange}>
-          <label>
-            <b>E-Mail:</b>
-            <input
-              type="email"
-              value={newEmail}
-              onChange={e => setNewEmail(e.target.value)}
-              disabled={loading}
-              required
-              style={{marginLeft: 10}}
-            />
-          </label>
-          <button type="submit" disabled={loading}>E-Mail aktualisieren</button>
-        </form>
+
+      <div style={{ marginBottom: 15 }}>
+        <b>E-Mail:</b> {email}
       </div>
 
-      <div style={{marginBottom: 15}}>
+      <div style={{ marginBottom: 15 }}>
         <form onSubmit={handlePhoneChange}>
           <label>
             <b>Telefonnummer:</b>
@@ -133,14 +95,14 @@ export default function ProfilePage() {
               onChange={e => setNewPhone(e.target.value)}
               disabled={loading}
               placeholder="+49123456789"
-              style={{marginLeft: 10}}
+              style={{ marginLeft: 10 }}
             />
           </label>
           <button type="submit" disabled={loading}>Telefon aktualisieren</button>
         </form>
       </div>
 
-      <div style={{marginBottom: 15}}>
+      <div style={{ marginBottom: 15 }}>
         <form onSubmit={handleDisplayNameChange}>
           <label>
             <b>Anzeigename:</b>
@@ -150,7 +112,7 @@ export default function ProfilePage() {
               onChange={e => setNewDisplayName(e.target.value)}
               disabled={loading}
               maxLength={64}
-              style={{marginLeft: 10}}
+              style={{ marginLeft: 10 }}
             />
           </label>
           <button type="submit" disabled={loading}>Anzeigename aktualisieren</button>
