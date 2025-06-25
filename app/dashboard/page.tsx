@@ -59,7 +59,7 @@ export default function DashboardPage() {
       <h2>Dashboard</h2>
       <button onClick={handleLogout}>Logout</button>
       <Link href="/profile"><button>Profil</button></Link>
-      <Link href="/settings"><button>Account</button></Link>
+      <Link href="/settings"><button>Settings</button></Link>
       <hr />
       <div>
         <input

@@ -3,6 +3,7 @@
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { supabase } from "../../lib/supabaseClient";
+import Link from "next/link";
 
 export default function ProfilePage() {
   const [username, setUsername] = useState("");
@@ -36,6 +37,9 @@ export default function ProfilePage() {
   return (
     <main>
       <h2>Profil bearbeiten</h2>
+      <Link href="/dashboard"><button>Dashboard</button></Link>
+      <Link href="/settings"><button>Settings</button></Link>
+      <hr />      
       <label>
         Name: <input value={username} onChange={e => setUsername(e.target.value)} />
       </label>

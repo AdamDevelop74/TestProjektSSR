@@ -3,6 +3,7 @@
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { supabase } from "../../lib/supabaseClient";
+import Link from "next/link";
 
 export default function SettingsPage() {
   const [password, setPassword] = useState("");
@@ -28,7 +29,10 @@ export default function SettingsPage() {
 
   return (
     <main>
-      <h2>Account Einstellungen</h2>
+       <h2>Account Einstellungen</h2>
+      <Link href="/dashboard"><button>Dashboard</button></Link>
+      <Link href="/profile"><button>Profil</button></Link>
+       <hr />       
       <label>
         Neues Passwort:
         <input type="password" value={password} onChange={e => setPassword(e.target.value)} />
