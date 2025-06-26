@@ -19,7 +19,7 @@ export default function ProfilePage() {
       setSession(session);
       if (!session) router.replace("/login");
       else {
-        setEmail(session.user.email);        
+        setEmail(session.user.email ?? "");  
         setDisplayName(session.user.user_metadata?.display_name ?? "");
         setNewDisplayName(session.user.user_metadata?.display_name ?? "");
       }
