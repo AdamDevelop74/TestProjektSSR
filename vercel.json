@@ -1,0 +1,10 @@
+/** einmal täglich um 6 Uhr morgens UTC */
+
+{
+  "cron": [
+    {
+      "path": "/api/ping-supabase",
+      "schedule": "0 6 * * *"
+    }
+  ]
+}
