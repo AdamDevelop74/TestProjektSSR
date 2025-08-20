@@ -1,5 +1,3 @@
-/** einmal täglich um 6 Uhr morgens UTC */
-
 {
   "cron": [
     {
