@@ -1,3 +1,4 @@
+// app/page.tsx  ->LandingPage als Server-Komponente (Kein "use client" nötig, daher SSR!)
 import Link from "next/link";
 
 export default function LandingPage() {
@@ -11,3 +12,6 @@ export default function LandingPage() {
     </main>
   );
 }
+
+
+

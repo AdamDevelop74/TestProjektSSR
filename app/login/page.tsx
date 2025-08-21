@@ -1,3 +1,4 @@
+// app/login/page.tsx ->LoginPage: mit "use client" → läuft im Browser, muss Client Only bleiben (Hooks).
 "use client";
 
 import { useState } from "react";
