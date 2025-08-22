@@ -1,8 +1,10 @@
 // app/dashboard/page.tsx -> DashboardPage als Server Component
+
 import { redirect } from "next/navigation";
 import { createSupabaseServerClient } from "@/lib/supabaseServer";
 import Link from "next/link";
 
+// Typen wie gehabt
 type Time = {
   id: string;
   started_at: string;
@@ -33,7 +35,7 @@ type Invoice = {
 export default async function DashboardPage() {
   const supabase = createSupabaseServerClient();
 
-  // Check session
+  // Session prüfen
   const { data: { session } } = await supabase.auth.getSession();
 
   if (!session) {
@@ -43,25 +45,31 @@ export default async function DashboardPage() {
   const userId = session.user.id;
 
   // Zeiteinträge
-  const { data: times = [] } = await supabase
+  let { data: times, error: timesError } = await supabase
     .from("time_entries")
     .select("*")
     .eq("user_id", userId)
-    .order("started_at", { ascending: false });
+    .order("started_at", { ascending: false }) as { data: Time[] | null; error: any };
+
+  times = times ?? [];
 
   // Projekte
-  const { data: projects = [] } = await supabase
+  let { data: projects, error: projectsError } = await supabase
     .from("projects")
     .select("*")
     .eq("user_id", userId)
-    .order("created_at", { ascending: false });
+    .order("created_at", { ascending: false }) as { data: Project[] | null; error: any };
+
+  projects = projects ?? [];
 
   // Rechnungen
-  const { data: invoices = [] } = await supabase
+  let { data: invoices, error: invoicesError } = await supabase
     .from("invoices")
     .select("*")
     .eq("user_id", userId)
-    .order("created_at", { ascending: false });
+    .order("created_at", { ascending: false }) as { data: Invoice[] | null; error: any };
+
+  invoices = invoices ?? [];
 
   return (
     <main className="min-h-screen bg-gradient-to-br from-green-100 via-emerald-100 to-green-200 py-8">
@@ -69,10 +77,9 @@ export default async function DashboardPage() {
         <div className="flex justify-between items-center mb-6">
           <h2 className="text-3xl font-extrabold text-emerald-800">Dashboard</h2>
           <form action="/api/logout" method="POST">
-            <button
-              className="bg-rose-500 hover:bg-rose-700 transition text-white font-semibold py-2 px-5 rounded-lg shadow"
-              type="submit"
-            >Logout</button>
+            <button className="bg-rose-500 hover:bg-rose-700 transition text-white font-semibold py-2 px-5 rounded-lg shadow" type="submit">
+              Logout
+            </button>
           </form>
         </div>
         {/* Profil/Settings Buttons */}
@@ -81,17 +88,14 @@ export default async function DashboardPage() {
             href="/profile"
             className="bg-blue-600 hover:bg-blue-800 transition px-6 py-3 rounded-lg text-white font-bold shadow text-lg text-center block w-40"
             style={{ letterSpacing: "0.02em" }}
-          >
-            Profil
-          </Link>
+          >Profil</Link>
           <Link
             href="/settings"
             className="bg-blue-600 hover:bg-blue-800 transition px-6 py-3 rounded-lg text-white font-bold shadow text-lg text-center block w-40"
             style={{ letterSpacing: "0.02em" }}
-          >
-            Settings
-          </Link>
+          >Settings</Link>
         </div>
+
         {/* ZEITEINTRÄGE */}
         <h3 className="text-2xl text-blue-900 mb-2 font-bold">Letzte Zeiteinträge</h3>
         <div className="overflow-x-auto mb-8">
