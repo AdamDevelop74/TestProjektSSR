@@ -5,7 +5,7 @@ export default function LandingPage() {
   return (
     <main>
       <h1>Zeiterfassung SaaS</h1>
-      <p>Einfach online Arbeitszeiten erfassen.</p>
+      <p>Einfach online Arbeitszeiten erfassen.(SSR)</p>
       <Link href="/login">
         <button>Login / Registrieren</button>
       </Link>
