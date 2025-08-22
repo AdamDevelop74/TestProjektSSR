@@ -1,29 +1,25 @@
-//app/dashboard/page.tsx 
-
-"use client";
-
-import { useEffect, useState } from "react";
-import { supabase } from "../../lib/supabaseClient";
-import { useRouter } from "next/navigation";
+// app/dashboard/page.tsx -> DashboardPage als Server Component
+import { redirect } from "next/navigation";
+import { createSupabaseServerClient } from "@/lib/supabaseServer";
 import Link from "next/link";
 
-interface Time {
+type Time = {
   id: string;
   started_at: string;
   ended_at: string | null;
   note: string | null;
   duration_minutes: number | null;
   project_id: string | null;
-}
+};
 
-interface Project {
+type Project = {
   id: string;
   name: string;
   description: string | null;
   created_at: string;
-}
+};
 
-interface Invoice {
+type Invoice = {
   id: string;
   invoice_number: string | null;
   amount: number | null;
@@ -32,90 +28,70 @@ interface Invoice {
   due_date: string | null;
   project_id: string | null;
   created_at: string;
-}
+};
 
-export default function DashboardPage() {
-  const [session, setSession] = useState<any>(null);
-  const [times, setTimes] = useState<Time[]>([]);
-  const [projects, setProjects] = useState<Project[]>([]);
-  const [invoices, setInvoices] = useState<Invoice[]>([]);
-  const router = useRouter();
+export default async function DashboardPage() {
+  const supabase = createSupabaseServerClient();
 
-  useEffect(() => {
-    supabase.auth.getSession().then(({ data: { session } }) => {
-      setSession(session);
-      if (!session) router.replace("/login");
-      else {
-        fetchAllData(session.user.id);
-      }
-    });
-    supabase.auth.onAuthStateChange((_, session) => setSession(session));
-    // eslint-disable-next-line
-  }, []);
+  // Check session
+  const { data: { session } } = await supabase.auth.getSession();
 
-  async function fetchAllData(userId: string) {
-    const { data: timeData } = await supabase
-      .from("time_entries")
-      .select("*")
-      .eq("user_id", userId)
-      .order("started_at", { ascending: false });
-    setTimes(timeData || []);
-
-    const { data: projectData } = await supabase
-      .from("projects")
-      .select("*")
-      .eq("user_id", userId)
-      .order("created_at", { ascending: false });
-    setProjects(projectData || []);
-
-    const { data: invoiceData } = await supabase
-      .from("invoices")
-      .select("*")
-      .eq("user_id", userId)
-      .order("created_at", { ascending: false });
-    setInvoices(invoiceData || []);
+  if (!session) {
+    redirect("/login"); // SSR-Redirect!
   }
 
-  async function handleLogout() {
-    await supabase.auth.signOut();
-    router.replace("/login");
-  }
+  const userId = session.user.id;
 
-  if (!session) return null;
+  // Zeiteinträge
+  const { data: times = [] } = await supabase
+    .from("time_entries")
+    .select("*")
+    .eq("user_id", userId)
+    .order("started_at", { ascending: false });
+
+  // Projekte
+  const { data: projects = [] } = await supabase
+    .from("projects")
+    .select("*")
+    .eq("user_id", userId)
+    .order("created_at", { ascending: false });
+
+  // Rechnungen
+  const { data: invoices = [] } = await supabase
+    .from("invoices")
+    .select("*")
+    .eq("user_id", userId)
+    .order("created_at", { ascending: false });
 
   return (
     <main className="min-h-screen bg-gradient-to-br from-green-100 via-emerald-100 to-green-200 py-8">
       <div className="max-w-5xl mx-auto bg-white/80 backdrop-blur-sm rounded-xl shadow-2xl p-8 border border-gray-200">
         <div className="flex justify-between items-center mb-6">
           <h2 className="text-3xl font-extrabold text-emerald-800">Dashboard</h2>
-          <button
-            className="bg-rose-500 hover:bg-rose-700 transition text-white font-semibold py-2 px-5 rounded-lg shadow"
-            onClick={handleLogout}
-          >
-            Logout
-          </button>
+          <form action="/api/logout" method="POST">
+            <button
+              className="bg-rose-500 hover:bg-rose-700 transition text-white font-semibold py-2 px-5 rounded-lg shadow"
+              type="submit"
+            >Logout</button>
+          </form>
         </div>
-
-        {/* Profil/Settings Buttons als groß, nebeneinander und kräftig blau */}
+        {/* Profil/Settings Buttons */}
         <div className="flex gap-6 mb-8">
-           <button
-            type="button"
-            onClick={() => router.push("/profile")}
+          <Link
+            href="/profile"
             className="bg-blue-600 hover:bg-blue-800 transition px-6 py-3 rounded-lg text-white font-bold shadow text-lg text-center block w-40"
             style={{ letterSpacing: "0.02em" }}
           >
             Profil
-          </button>
-          <button
-            type="button"
-            onClick={() => router.push("/settings")}
+          </Link>
+          <Link
+            href="/settings"
             className="bg-blue-600 hover:bg-blue-800 transition px-6 py-3 rounded-lg text-white font-bold shadow text-lg text-center block w-40"
             style={{ letterSpacing: "0.02em" }}
           >
             Settings
-          </button>
+          </Link>
         </div>
-
         {/* ZEITEINTRÄGE */}
         <h3 className="text-2xl text-blue-900 mb-2 font-bold">Letzte Zeiteinträge</h3>
         <div className="overflow-x-auto mb-8">
@@ -152,7 +128,6 @@ export default function DashboardPage() {
             </tbody>
           </table>
         </div>
-
         {/* PROJEKTE */}
         <h3 className="text-2xl text-teal-900 mb-2 font-bold">Projekte</h3>
         <div className="overflow-x-auto mb-8">
@@ -177,7 +152,6 @@ export default function DashboardPage() {
             </tbody>
           </table>
         </div>
-
         {/* RECHNUNGEN */}
         <h3 className="text-2xl text-pink-900 mb-2 font-bold">Rechnungen</h3>
         <div className="overflow-x-auto">
