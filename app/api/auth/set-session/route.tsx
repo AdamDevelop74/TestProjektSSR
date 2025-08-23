@@ -3,17 +3,33 @@
 
 // app/api/auth/callback/route.ts
 import { NextRequest, NextResponse } from "next/server";
-import { createRouteHandlerClient } from '@supabase/auth-helpers-nextjs'; //kümmert sich um das Setzen der Session Cookies.
+import { createRouteHandlerClient } from '@supabase/auth-helpers-nextjs';
 import { cookies } from "next/headers";
 
 export async function POST(request: NextRequest) {
+  // cookies MUSS aufgerufen werden!
   const supabase = createRouteHandlerClient({ cookies });
-  const { email, password } = await request.json();
+
+  let email: string, password: string;
+  try {
+    ({ email, password } = await request.json());
+    if (!email || !password) {
+      return NextResponse.json({ error: "Email und Passwort sind erforderlich." }, { status: 400 });
+    }
+  } catch (e) {
+    return NextResponse.json({ error: "Ungültiger Request Body" }, { status: 400 });
+  }
+
   const { data, error } = await supabase.auth.signInWithPassword({
     email, password
   });
-  // Die Library setzt automatisch Cookies falls du sie richtig konfigurierst!
-  return NextResponse.json({ user: data.user, error });
+
+  if (error) {
+    return NextResponse.json({ error: error.message }, { status: 401 });
+  }
+
+  // Die Library setzt automatisch Session Cookies, wenn richtig konfiguriert!
+  return NextResponse.json({ user: data.user });
 }
 
 
