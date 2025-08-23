@@ -1,8 +1,41 @@
 // app/api/projects/route.ts
+// import { supabaseServer } from '@/lib/supabaseServer';
+// import { NextResponse } from 'next/server';
+
+// export async function POST(request: Request) {
+//   const supabase = supabaseServer();
+
+//   const { name, description } = await request.json();
+//   const { data: userData } = await supabase.auth.getUser();
+
+//   if (!userData?.user) {
+//     return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+//   }
+
+//   const { data, error } = await supabase
+//     .from('projects')
+//     .insert([
+//       {
+//         name,
+//         description,
+//         user_id: userData.user.id, // falls du Userbindung hast
+//       },
+//     ])
+//     .select();
+
+//   if (error) {
+//     return NextResponse.json({ error: error.message }, { status: 500 });
+//   }
+
+//   return NextResponse.json({ project: data[0] });
+// }
+
+// app/api/projects/route.ts
 import { supabaseServer } from '@/lib/supabaseServer';
 import { NextResponse } from 'next/server';
+import type { NextRequest } from 'next/server';
 
-export async function POST(request: Request) {
+export async function POST(request: NextRequest) {
   const supabase = supabaseServer();
 
   const { name, description } = await request.json();
@@ -18,7 +51,7 @@ export async function POST(request: Request) {
       {
         name,
         description,
-        user_id: userData.user.id, // falls du Userbindung hast
+        user_id: userData.user.id,
       },
     ])
     .select();
@@ -27,7 +60,7 @@ export async function POST(request: Request) {
     return NextResponse.json({ error: error.message }, { status: 500 });
   }
 
-  return NextResponse.json({ project: data[0] });
+  return NextResponse.json({ project: data?.[0] });
 }
 
 
