@@ -1,12 +1,11 @@
-// lib/supabaseServerClient.ts
-import { createServerComponentClient } from '@supabase/auth-helpers-nextjs';
-import { cookies } from 'next/headers';
+// lib/supabaseServer.ts
+import { createServerComponentClient } from "@supabase/auth-helpers-nextjs";
+import { cookies } from "next/headers";
+//import { Database } from "@/types/supabase";
 
-export function createSupabaseServerClient() {
+export function supabaseServer() {
   return createServerComponentClient({ cookies }); // KEINE Übergabe von Url und Key nötig!
 }
-
-
 
 
 // Wofür:Server Components und SSR (Server Side Rendering) in Next.js.
