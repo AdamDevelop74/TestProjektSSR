@@ -31,38 +31,42 @@
 // }
 
 // app/api/projects/route.ts
-import { supabaseServer } from '@/lib/supabaseServer';
+// import { supabaseServer } from '@/lib/supabaseServer';
+// import { NextResponse } from 'next/server';
+// import type { NextRequest } from 'next/server';
+
+// export async function POST(request: NextRequest) {
+//   const supabase = supabaseServer();
+
+//   const { name, description } = await request.json();
+//   const { data: userData } = await supabase.auth.getUser();
+
+//   if (!userData?.user) {
+//     return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+//   }
+
+//   const { data, error } = await supabase
+//     .from('projects')
+//     .insert([
+//       {
+//         name,
+//         description,
+//         user_id: userData.user.id,
+//       },
+//     ])
+//     .select();
+
+//   if (error) {
+//     return NextResponse.json({ error: error.message }, { status: 500 });
+//   }
+
+//   return NextResponse.json({ project: data?.[0] });
+// }
+
 import { NextResponse } from 'next/server';
-import type { NextRequest } from 'next/server';
-
-export async function POST(request: NextRequest) {
-  const supabase = supabaseServer();
-
-  const { name, description } = await request.json();
-  const { data: userData } = await supabase.auth.getUser();
-
-  if (!userData?.user) {
-    return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
-  }
-
-  const { data, error } = await supabase
-    .from('projects')
-    .insert([
-      {
-        name,
-        description,
-        user_id: userData.user.id,
-      },
-    ])
-    .select();
-
-  if (error) {
-    return NextResponse.json({ error: error.message }, { status: 500 });
-  }
-
-  return NextResponse.json({ project: data?.[0] });
+export async function POST() {
+  return NextResponse.json({ test: 'ok' });
 }
-
 
 
 // Beispiel für eine Server-API, die einen Project-Record für den eingeloggten User anlegt.
