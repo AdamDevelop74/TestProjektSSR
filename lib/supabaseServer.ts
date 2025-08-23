@@ -3,7 +3,7 @@ import { createServerComponentClient } from "@supabase/auth-helpers-nextjs";
 import { cookies } from "next/headers";
 //import { Database } from "@/types/supabase";
 
-export function supabaseServer() {
+export function createSupabaseServerClient() {
   return createServerComponentClient({ cookies }); // KEINE Übergabe von Url und Key nötig!
 }
 
