@@ -41,7 +41,8 @@ export default async function DashboardPage() {
   const { data: { session } } = await supabase.auth.getSession();
 
   console.log("dashboard1")
-  //console.log("SSR-Cookies:", cookies().getAll());
+  const cookieStore = await cookies(); // <-- await notwendig!
+  console.log(cookieStore.getAll());
 
   if (!session) {
     console.log("dashboard2")
