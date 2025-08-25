@@ -41,10 +41,13 @@ export default async function DashboardPage() {
   console.log("dashboard1")
 
   if (!session) {
+    console.log("dashboard2")
+
     redirect("/login"); // SSR-Redirect!
-    console.log("dashboard-redirect-login")
+    
   }
 
+  console.log("dashboard3")
   const userId = session.user.id;
   console.log("SSR: env-URL", process.env.NEXT_PUBLIC_SUPABASE_URL)
   console.log("SSR: env-KEY", process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY)

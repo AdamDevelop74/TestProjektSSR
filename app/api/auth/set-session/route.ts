@@ -6,6 +6,8 @@ export async function POST(req: Request) {
   try {
     const { access_token, refresh_token, expires_in } = await req.json()
 
+    console.log("route1")
+
     if (!access_token || !refresh_token) {
       console.error("❌ Tokens fehlen in der Anfrage.")
       return NextResponse.json({ error: 'Missing tokens' }, { status: 400 })
@@ -16,6 +18,8 @@ export async function POST(req: Request) {
     const refreshTokenMaxAge = 60 * 60 * 24 * 30 // 30 Tage
 
     const response = NextResponse.json({ success: true })
+    console.log("route2")
+
 
     // Access-Token als HttpOnly-Cookie setzen (für Server Components & SSR!)
     response.cookies.set('access_token', access_token, {
@@ -26,6 +30,9 @@ export async function POST(req: Request) {
       maxAge: accessTokenMaxAge, // Sekunden (1h default)
     })
 
+    console.log("route3")
+
+
     // Refresh-Token als HttpOnly-Cookie setzen (länger gültig)
     response.cookies.set('refresh_token', refresh_token, {
       httpOnly: true,
@@ -35,8 +42,8 @@ export async function POST(req: Request) {
       maxAge: refreshTokenMaxAge, // 30 Tage
     })
 
-    console.log("route/access_token", access_token)
-    console.log("route/refresh_token", refresh_token)
+    console.log("route4")
+
 
     return response
   } catch (err) {
