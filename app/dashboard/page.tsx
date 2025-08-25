@@ -104,21 +104,15 @@ export default async function DashboardPage() {
   invoices = invoices ?? [];
 
 
-   const handleLogout = async () => {
-    await supabase.auth.signOut()
-    redirect("/login"); // SSR-Redirect!
-  }
-
   return (
     <main className="min-h-screen bg-gradient-to-br from-green-100 via-emerald-100 to-green-200 py-8">
       <div className="max-w-5xl mx-auto bg-white/80 backdrop-blur-sm rounded-xl shadow-2xl p-8 border border-gray-200">
         <div className="flex justify-between items-center mb-6">
           <h2 className="text-3xl font-extrabold text-emerald-800">Dashboard</h2>
           <form action="/api/logout" method="POST">
-            <button
-              className="bg-rose-500 hover:bg-rose-700 transition text-white font-semibold py-2 px-5 rounded-lg shadow"
-              onClick={handleLogout}>
-              Logout
+            <button type="submit"
+              className="bg-rose-500 hover:bg-rose-700 transition text-white font-semibold py-2 px-5 rounded-lg shadow">
+                Logout
             </button>
           </form>
         </div>
