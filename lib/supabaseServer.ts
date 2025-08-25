@@ -8,6 +8,7 @@ export function createSupabaseServerClient() {
 }
 
 
+
 // Wofür:Server Components und SSR (Server Side Rendering) in Next.js.
 // Wie:Mit createServerComponentClient, nutzt ebenfalls Next.js-Cookies.
 // Wann nutzen:Innerhalb von Server Components oder Server Actions (besonders, wenn Session/Auth benötigt wird).
