@@ -3,6 +3,8 @@
 import { redirect } from "next/navigation";
 import { createSupabaseServerClient } from "@/lib/supabaseServer";
 import Link from "next/link";
+import { cookies } from "next/headers";
+
 
 // Typen wie gehabt
 type Time = {
@@ -39,6 +41,7 @@ export default async function DashboardPage() {
   const { data: { session } } = await supabase.auth.getSession();
 
   console.log("dashboard1")
+  //console.log("SSR-Cookies:", cookies().getAll());
 
   if (!session) {
     console.log("dashboard2")

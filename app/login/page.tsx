@@ -35,7 +35,9 @@ export default function LoginPage() {
 
       console.log("login->data.session", data.session)
       
-      router.push("/dashboard");
+      // Statt router.push("/dashboard") 
+      window.location.href = "/dashboard" 
+      
     } else if (error) {
       alert(error.message);
     }
