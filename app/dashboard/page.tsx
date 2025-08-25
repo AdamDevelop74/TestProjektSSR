@@ -38,8 +38,13 @@ export default async function DashboardPage() {
   // Session prüfen
   const { data: { session } } = await supabase.auth.getSession();
 
+  console.log("dashboard1")
+
   if (!session) {
     redirect("/login"); // SSR-Redirect!
+    console.log("dashboard2")
+    console.log("SSR: env-URL", process.env.NEXT_PUBLIC_SUPABASE_URL)
+    console.log("SSR: env-KEY", process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY)
   }
 
   const userId = session.user.id;
