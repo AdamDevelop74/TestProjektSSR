@@ -32,6 +32,7 @@ export default function LoginPage() {
     const { data, error } = await supabase.auth.signInWithPassword({ email, password });
     if (!error && data.session) {
       await setSessionCookie(data.session); // Session an backend/route zum Cookie setzen schicken
+      console.log("login/page/setSessionCookie/data.session", data.session)
       router.push("/dashboard");
     } else if (error) {
       alert(error.message);

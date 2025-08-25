@@ -35,6 +35,9 @@ export async function POST(req: Request) {
       maxAge: refreshTokenMaxAge, // 30 Tage
     })
 
+    console.log("route/access_token", access_token)
+    console.log("route/refresh_token", refresh_token)
+
     return response
   } catch (err) {
     console.error("❌ Unerwarteter Fehler:", err)
