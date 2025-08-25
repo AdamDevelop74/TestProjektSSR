@@ -1,9 +1,17 @@
 // app/dashboard/page.tsx -> DashboardPage als Server Component
 
-import { redirect } from "next/navigation";
+
+
+
+
+import { createServerComponentClient } from "@supabase/auth-helpers-nextjs"
+import { cookies } from "next/headers"
+import { redirect } from "next/navigation"
+
+//import { redirect } from "next/navigation";
 import { createSupabaseServerClient } from "@/lib/supabaseServer";
 import Link from "next/link";
-import { cookies } from "next/headers";
+//import { cookies } from "next/headers";
 
 
 // Typen wie gehabt
@@ -35,7 +43,15 @@ type Invoice = {
 };
 
 export default async function DashboardPage() {
-  const supabase = createSupabaseServerClient();
+
+  const supabase = createServerComponentClient({ cookies });
+  const { data: { user } } = await supabase.auth.getUser();
+
+  if (!user) {
+    redirect("/login");
+  }
+
+  //const supabase = createSupabaseServerClient();
 
   // Session prüfen
   const { data: { session } } = await supabase.auth.getSession();
