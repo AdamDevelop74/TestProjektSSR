@@ -42,12 +42,13 @@ export default async function DashboardPage() {
 
   if (!session) {
     redirect("/login"); // SSR-Redirect!
-    console.log("dashboard2")
-    console.log("SSR: env-URL", process.env.NEXT_PUBLIC_SUPABASE_URL)
-    console.log("SSR: env-KEY", process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY)
+    console.log("dashboard-redirect-login")
   }
 
   const userId = session.user.id;
+  console.log("SSR: env-URL", process.env.NEXT_PUBLIC_SUPABASE_URL)
+  console.log("SSR: env-KEY", process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY)
+  console.log("userId", userId)
 
   // Zeiteinträge
   let { data: times, error: timesError } = await supabase
