@@ -15,6 +15,7 @@ export default function LoginPage() {
   async function setSessionCookie(session: any) {
     // Hole Tokens aus Supabase Session Object (evtl. .session oder .data.session, je nach Client-Version)
     const { access_token, refresh_token, expires_in } = session;
+    
     // API-Route zum Setzen der Cookies aufrufen!
     await fetch("/api/auth/set-session", {
       method: "POST",
